@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<div class="container"></div>
+<table class="table table-dark table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Opções</th>
+      </tr>
+    </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <a href="{{user.id}}/remove_user" onclick="return confirm('Deseja excluir este registro?')" class="btn btn-danger btn-xs">Excluir</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+</table>
+<a href="/register" style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px;">Cadastrar Novo Usuário</a>
+</div>
+{% endblock conteudo %}
