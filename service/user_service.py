@@ -25,3 +25,6 @@ def update_user(previous_user, new_user):
 def list_user_id(id):
     user = User.query.filter_by(id=id).first()
     return user
+
+def list_user_email(email):
+    return User.query.filter_by(email=email).first()

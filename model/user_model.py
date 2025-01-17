@@ -12,5 +12,8 @@ class User(db.Model):
     def encrypt_password(self):
         self.password = pbkdf2_sha256.hash(self.password)
 
+    # def show_password(self, password):
+    #     return pbkdf2_sha256.verify(password, self.senha)
     def show_password(self, password):
-        return pbkdf2_sha256.verify(password, self.senha)
+    # Ajuste aqui: era self.senha, mas a coluna no banco é self.password
+        return pbkdf2_sha256.verify(password, self.password)

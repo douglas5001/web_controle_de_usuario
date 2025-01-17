@@ -1,12 +1,14 @@
 from flask import Flask, request, make_response, jsonify, url_for, redirect, render_template
 from __init__ import db, ma, jwt
 from flask_restful import Api, Resource
+from schema.login_schema import LoginSchema
 from schema.user_schema import UserSchema
 from entity.user import User
-from service.user_service import list_user, create_user, delete_user, list_user_id, update_user
+from service.user_service import list_user, create_user, delete_user, list_user_id, update_user, list_user_email
 import os
 from dotenv import load_dotenv
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
+from datetime import timedelta
 
 load_dotenv()
 
@@ -24,12 +26,20 @@ db.init_app(app)
 ma.init_app(app)
 jwt.init_app(app)
 
-@app.route("/")
+app.config["JWT_SECRET_KEY"] = "sua_chave_muito_secreta"
+
+@app.route("/", methods=["GET"])
+@jwt_required(locations=["cookies"])  # Busca o token nos cookies
 def get_user():
-    user_model = list_user()
-    user_schema = UserSchema(many=True)
-    users = user_schema.dump(user_model)
-    return render_template("index.html", users=users)
+    current_user_id = get_jwt_identity()
+    user_model = list_user_id(current_user_id)
+
+    if not user_model:
+        return jsonify({"message": "Usuário não encontrado"}), 404
+    
+    user_schema = UserSchema()
+    user_data = user_schema.dump(user_model)
+    return render_template("index.html", user=user_data)
 
 @app.route("/register", methods=["GET", "POST"])
 def register_user():
@@ -78,9 +88,7 @@ def put_user(id):
         
         #user_new = list_user_id(id)
         return redirect("/")
- 
-@app.route("/login")
-@jwt.additional_claims_loader  
+   
 def add_claims_to_access_token(identity):
     user_token = list_user_id(identity)
     if user_token.is_admin:
@@ -88,6 +96,23 @@ def add_claims_to_access_token(identity):
     else:
         roles = 'user'
     return {'roles':roles}
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    user = list_user_email(email)
+    if user and user.show_password(password):
+        # Gerar token JWT
+        access_token = create_access_token(identity=user.id)
+
+        # Retornar o token em um cookie
+        response = make_response(redirect("/"))  # Redireciona para a rota protegida
+        response.set_cookie("access_token", access_token, httponly=True, secure=True)
+        return response
+    else:
+        return render_template("login.html", error="Credenciais inválidas")
 
 
 
