@@ -1,4 +1,3 @@
-
 from __init__ import ma
 from model.user_model import User
 from marshmallow import fields

@@ -12,9 +12,9 @@ from datetime import timedelta
 
 load_dotenv()
 
-server = os.getenv('host')
+server = os.getenv('server')
 database = os.getenv('database')
-username = os.getenv('user')
+username = os.getenv('username')
 password = os.getenv('password')
 
 app = Flask(__name__)
@@ -29,17 +29,11 @@ jwt.init_app(app)
 app.config["JWT_SECRET_KEY"] = "sua_chave_muito_secreta"
 
 @app.route("/", methods=["GET"])
-@jwt_required(locations=["cookies"])  # Busca o token nos cookies
 def get_user():
-    current_user_id = get_jwt_identity()
-    user_model = list_user_id(current_user_id)
-
-    if not user_model:
-        return jsonify({"message": "Usuário não encontrado"}), 404
-    
-    user_schema = UserSchema()
-    user_data = user_schema.dump(user_model)
-    return render_template("index.html", user=user_data)
+    user_model = list_user()
+    user_schema = UserSchema(many=True)
+    users = user_schema.dump(user_model)
+    return render_template("index.html", users=users)
 
 @app.route("/register", methods=["GET", "POST"])
 def register_user():
@@ -114,6 +108,9 @@ def login():
     else:
         return render_template("login.html", error="Credenciais inválidas")
 
+@app.route("/layout")
+def layout():
+    return render_template("layout.html")
 
 
 

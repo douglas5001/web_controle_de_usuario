@@ -3,7 +3,7 @@ from passlib.hash import pbkdf2_sha256
 
 class User(db.Model):
     __tablename__ = "user"
-    __table_args__ = {"schema": "schema_estudo"}
+    __table_args__ = {"schema": "estudos_douglas"}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
