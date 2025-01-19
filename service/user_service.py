@@ -5,7 +5,7 @@ def list_user():
     return users
 
 def create_user(user):
-    user_db = User(name=user.name, email=user.email, password=user.password)
+    user_db = User(name=user.name, email=user.email, password=user.password, is_admin=user.is_admin)
     user_db.encrypt_password()
     db.session.add(user_db)
     db.session.commit()
