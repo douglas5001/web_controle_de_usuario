@@ -40,6 +40,34 @@ app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 
 jwt = JWTManager(app)
 
+
+@app.route("/register_task", methods=["GET", "POST"])
+@jwt_required()  # Exige autenticação
+def register_task():
+    user_id = get_jwt_identity()  # Obtém o ID do usuário autenticado
+    if request.method == "POST":
+        ts = TaskSchema()
+        validate = ts.validate(request.form)
+        if validate:
+            return render_template("register_task.html", errors=validate)
+
+        event = request.form["event"]
+        content = request.form["content"]
+        priority = request.form["priority"]
+        date_creation = request.form["date_creation"]
+
+        new_task = Task(event=event, content=content, priority=int(priority), date_creation=date_creation)
+        user = list_user_id(user_id)
+
+        if user:
+            user.tasks.append(new_task)  # Associa a tarefa ao usuário autenticado
+            db.session.add(new_task)
+            db.session.commit()
+            return redirect("/")  # Redireciona para a página inicial ou outra página
+
+    return render_template("register_task.html")
+
+
 def add_claims_to_access_token(identity):
     user_token = list_user_id(identity)
     if user_token.is_admin:
@@ -58,8 +86,6 @@ def login():
 
     user = list_user_email(email)
     if user and user.show_password(password):
-        # Certifique-se de que o `identity` seja uma string
-        #access_token = create_access_token(identity=str(user.id), expires_delta=timedelta(hours=1))
         access_token = create_access_token(identity=str(user.id), additional_claims=add_claims_to_access_token(user.id))
         app.logger.info(access_token)
         response = make_response(redirect("/"))
@@ -83,7 +109,7 @@ def get_user():
 
 
 @app.route("/register", methods=["GET", "POST"])
-@admin_required
+#@admin_required
 def register_user():
     if request.method == "POST":
         us = UserSchema()
