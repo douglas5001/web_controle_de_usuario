@@ -165,6 +165,11 @@ def layout():
     return render_template("index.html")
 
 
+@app.route("/slider")
+def sliderbar():
+    return render_template("sliderbar.html")
+
+
 
 if __name__ == "__main__":
     with app.app_context():
