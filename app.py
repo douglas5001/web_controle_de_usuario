@@ -2,6 +2,7 @@ from flask import Flask, request, make_response, jsonify, url_for, redirect, ren
 from __init__ import db, ma, jwt
 from flask_restful import Api, Resource
 from decorator import admin_required
+from model.user_model import Task
 from schema.login_schema import LoginSchema
 from schema.user_schema import UserSchema
 from entity.user import User
@@ -42,15 +43,11 @@ jwt = JWTManager(app)
 
 
 @app.route("/register_task", methods=["GET", "POST"])
-@jwt_required()  # Exige autenticação
+@jwt_required()  
 def register_task():
-    user_id = get_jwt_identity()  # Obtém o ID do usuário autenticado
-    if request.method == "POST":
-        ts = TaskSchema()
-        validate = ts.validate(request.form)
-        if validate:
-            return render_template("register_task.html", errors=validate)
+    user_id = get_jwt_identity() 
 
+    if request.method == "POST":
         event = request.form["event"]
         content = request.form["content"]
         priority = request.form["priority"]
@@ -60,10 +57,10 @@ def register_task():
         user = list_user_id(user_id)
 
         if user:
-            user.tasks.append(new_task)  # Associa a tarefa ao usuário autenticado
+            new_task.users.append(user) 
             db.session.add(new_task)
             db.session.commit()
-            return redirect("/")  # Redireciona para a página inicial ou outra página
+            return redirect("/")
 
     return render_template("register_task.html")
 
@@ -106,6 +103,18 @@ def get_user():
 
     return render_template("users.html", users=users)
 
+
+@app.route("/", methods=["GET"])
+@jwt_required()  # Garante que apenas usuários autenticados acessem a página
+def layout():
+    user_id = get_jwt_identity()  # Obtém o ID do usuário autenticado
+    user = list_user_id(user_id)
+
+    if not user:
+        return redirect(url_for("login"))
+
+    tasks = user.tasks  # Obtém as tarefas associadas ao usuário logado
+    return render_template("index.html", tasks=tasks)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -159,10 +168,6 @@ def put_user(id):
         
         #user_new = list_user_id(id)
         return redirect("/users")
-
-@app.route("/")
-def layout():
-    return render_template("index.html")
 
 
 @app.route("/slider")

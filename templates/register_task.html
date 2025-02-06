@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+
+<br>
+<br>
+
+<h2 class="container text-center fw-bold">Cadastro de Chamado</h2>
+<div class="container border rounded border-dark p-4">
+    
+
+    <form action="/register_task" method="POST">
+        <div class="row">
+
+            <div class="form-group col-md-6">
+                <label for="event">Evento:</label>
+                <input type="text" id="event" name="event" required class="form-control"><br><br>
+            </div>
+
+
+        </div>
+
+        
+        <div class="form-group ">
+            <label for="content">Conteúdo:</label>
+            <textarea id="content" class="form-control" name="content" required></textarea><br><br>
+        </div>
+            
+        
+        
+        
+        <label for="priority" class="mr-sm-2">Prioridade:</label>
+        <select class="form-select" id="priority" name="priority">
+            <option value="1">Baixa</option>
+            <option value="2">Média</option>
+            <option value="3">Alta</option>
+        </select><br><br>
+        
+        <div class="mb-3">
+            <label for="date_creation" class="form-label">Data de Criação:</label>
+            <input type="date" id="date_creation" name="date_creation" class="form-control" required>
+        </div>
+        
+        <button type="submit">Cadastrar</button>
+
+        
+    </form>
+
+
+</div>
+
+
+{% endblock conteudo %}
