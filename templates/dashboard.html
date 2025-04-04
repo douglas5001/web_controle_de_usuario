@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<div class="container">
+    <h2 class="text-center mt-5">Dashboard com Gráfico</h2>
+   
+    
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-grafico">
+                    {{ grafico | safe }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-grafico">
+                    <h5>Outro conteúdo aqui</h5>
+                    <p>Você pode colocar outro gráfico, texto ou componentes aqui.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock conteudo %}

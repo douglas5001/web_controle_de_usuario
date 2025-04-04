@@ -1,0 +1,31 @@
+.custom-table {
+    background-color: #ffffff;
+    color: #333;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.custom-table thead {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.custom-table thead th {
+    padding: 12px;
+}
+
+.custom-table tbody td {
+    padding: 10px 12px;
+    vertical-align: middle;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.custom-table tr:hover {
+    background-color: #f1f1f1;
+}

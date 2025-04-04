@@ -1,5 +1,5 @@
 from model.user_model import User
-from __init__ import db
+from app import db
 def list_user():
     users = User.query.all()
     return users

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+
+<div class="container-fluid px-4">
+    <h2 class="text-white mt-5">Dashboard com Gráfico</h2>
+
+    <div class="row">
+        <div class="col-12 col-xl-6 mb-4">
+            <div class="card-grafico">
+                <h5>Outro conteúdo aqui</h5>
+                <p>Você pode colocar outro gráfico, texto ou componentes aqui.</p>
+            </div>
+        </div>
+        <div class="col-12 col-xl-6 mb-4">
+            <div class="card-grafico">
+                <h5>Outro conteúdo aqui</h5>
+                <p>Você pode colocar outro gráfico, texto ou componentes aqui.</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6 mb-4">
+            <div class="card-grafico">
+                <h2 class="text-dark mb-4">Notificações Cíveis</h2>
+                {% if pastas %}
+                <div class="table-responsive rounded-3 shadow">
+                    <table class="table custom-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Pasta ID</th>
+                                <th>Data</th>
+                                <th>Prazo Final</th>
+                                <th>Responsável</th>
+                                <th>Evento</th>
+                                <th>Conteúdo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pasta in pastas %}
+                            <tr>
+                                <td>{{ pasta.pasta_id }}</td>
+                                <td>{{ pasta.data }}</td>
+                                <td>{{ pasta.prazo_final }}</td>
+                                <td>{{ pasta.responsavel }}</td>
+                                <td>{{ pasta.evento }}</td>
+                                <td>{{ pasta.conteudo }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <div class="alert alert-warning mt-4">Nenhuma notificação encontrada.</div>
+                {% endif %}
+                <br>
+                <a href="{{ url_for('notification_gcpj.exportar_notificacoes_excel') }}" class="btn btn-success mt-3">Download Excel</a>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+{% endblock conteudo %}

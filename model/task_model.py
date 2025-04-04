@@ -1,8 +1,8 @@
-from __init__ import db
+from app import db
 from user_model import user_task
 
 class Task(db.Model):
-    __tablename__ = "task"
+    __tablename__ = "web_teste_task"
     __table_args__ = {"schema": "estudos_douglas"}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     event = db.Column(db.Text, nullable=False)

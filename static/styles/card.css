@@ -1,0 +1,14 @@
+.card-grafico {
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: none;
+    transition: transform 0.3s ease;
+}
+
+.card-grafico:hover {
+    transform: translateY(-5px);
+}

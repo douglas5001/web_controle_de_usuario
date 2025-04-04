@@ -1,6 +1,10 @@
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
+
+/* Botão do menu */
 .menu-toggle {
     position: fixed;
     top: 20px;
@@ -10,9 +14,11 @@ body {
     border: none;
     padding: 10px 15px;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 1001;
     border-radius: 5px;
 }
+
+/* Sidebar */
 .sidebar {
     position: fixed;
     top: 0;
@@ -23,20 +29,38 @@ body {
     color: white;
     padding-top: 60px;
     transition: left 0.3s ease;
+    z-index: 1000;
 }
+
 .sidebar.active {
     left: 0;
 }
+
 .sidebar ul {
     list-style-type: none;
     padding: 0;
+    margin: 0;
 }
+
 .sidebar ul li {
     padding: 15px;
     text-align: center;
 }
+
 .sidebar ul li a {
     color: white;
     text-decoration: none;
     display: block;
+}
+
+/* Conteúdo principal */
+.conteudo-principal {
+    transition: margin-left 0.3s ease;
+    margin-left: 0;
+    padding: 20px;
+}
+
+/* Quando o menu está aberto, empurra o conteúdo */
+.sidebar.active ~ .conteudo-principal {
+    margin-left: 250px;
 }

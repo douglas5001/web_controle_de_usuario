@@ -1,4 +1,4 @@
-from __init__ import db
+from app import db
 from passlib.hash import pbkdf2_sha256
 
 # Tabela de associação para relação n para n
