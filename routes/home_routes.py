@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, request, url_for, jsonify, make_response
 from app import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from decorator import admin_required
 from schema.user_schema import UserSchema
 from service.user_service import list_user, create_user, delete_user, list_user_id, update_user
 from entity.user import User
@@ -8,7 +9,7 @@ from entity.user import User
 home_bp = Blueprint("home", __name__)
 
 @home_bp.route("/", methods=["GET"])
-@jwt_required()  # Garante que apenas usuários autenticados acessem a página
+@admin_required
 def layout():
     user_id = get_jwt_identity()  # Obtém o ID do usuário autenticado
     user = list_user_id(user_id)

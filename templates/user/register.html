@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<br><br>
+<p class="container text-center fw-bold">Cadastro de Usuário</p>
+<div class="container border rounded border-dark p-4">
+    <form action="/register" method="POST">
+        <div class="row">
+            <div class="form-group col-md-6">
+              <label for="name">Nome</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Nome">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="password">Senha</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Senha">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="is_admin">Admin</label>
+                <select id="is_admin" name="is_admin" class="form-control">
+                    <option value="false" selected>False</option>
+                    <option value="true">True</option>
+                </select>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label for="profile_id">Perfil</label>
+                <select id="profile_id" name="profile_id" class="form-control">
+                    <option value="">Selecione um perfil</option>
+                    {% for p in profiles %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Cadastrar</button>
+        <a href="{{ url_for('user.get_user') }}" class="btn btn-danger">Cancelar</a>
+    </form>
+    {% if errors %}
+    <div style="color: red;">
+        <ul>
+            {% for field, error_messages in errors.items() %}
+                {% for error in error_messages %}
+                    <li>{{ field }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock conteudo %}

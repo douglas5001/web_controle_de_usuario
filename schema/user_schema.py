@@ -12,10 +12,11 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         load_instance = True
-        fields = ("id", "name", "email", "password", "is_admin", "tasks")
+        fields = ("id", "name", "email", "password", "is_admin", "profile_id", "tasks")
 
     tasks = fields.List(fields.Nested(TaskSchema))
     name = fields.String(required=True)
     email = fields.String(required=True)
     password = fields.String(required=True)
     is_admin = fields.Boolean(required=True)
+    profile_id = fields.Integer(required=False, allow_none=True)

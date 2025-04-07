@@ -1,40 +1,112 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>web Test</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
-    <link href="../static/styles/menu.css" rel="stylesheet">
-    <link href="../static/styles/card.css" rel="stylesheet">
-    <link href="../static/styles/table.css" rel="stylesheet">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>web Test</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/menu.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/card.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/table.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/iframe.css') }}">
 </head>
 <body>
-  <body>
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <nav class="sidebar" id="sidebar">
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="users">User</a></li>
-            <li><a href="register">cadastro</a></li>
-            <li><a href="login">login</a></li>
-            <li><a href="#">Contato</a></li>
-        </ul>
-    </nav>
+  <button class="menu-toggle" onclick="toggleMenu()" id="toggleButton">
+    <i id="toggleIcon" class="bi bi-chevron-right"></i>
+    <img id="empresaLogo" src="../static/assets/image/saratt.png" alt="Logo da Empresa">
+  </button>
 
- 
-        {% block conteudo %}
-        {% endblock conteudo %}
+  <nav class="sidebar" id="sidebar">
+    <br><br>
+    <ul class="listaMenu">
+      <li class="itemMenu">
+        <a href="/">
+          <i class="bi bi-house iconMenu"></i>
+          <span class="menuText">Home</span>
+        </a>
+      </li>
+      <li class="itemMenu">
+        <a href="users">
+          <i class="bi bi-bar-chart-line iconMenu"></i>
+          <span class="menuText">User</span>
+        </a>
+      </li>
+      <li class="itemMenu">
+        <a href="register">
+          <i class="bi bi-person-plus iconMenu"></i>
+          <span class="menuText">Cadastro</span>
+        </a>
+      </li>
 
-    <script>
-      function toggleMenu() {
-          document.getElementById("sidebar").classList.toggle("active");
-          }
-    </script>
-      
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <!-- Submenu 1: Dashboard -->
+      <li class="itemMenu">
+        <a class="menuLink d-flex align-items-center" data-bs-toggle="collapse" href="#collapseDashboard" role="button"
+           aria-expanded="false" aria-controls="collapseDashboard">
+          <i class="bi bi-bar-chart-line iconMenu"></i>
+          <span class="menuText">Dashboard</span>
+          <i id="arrowDashboard" class="bi bi-chevron-right ms-2 arrowIcon"></i>
+        </a>
+        <div class="collapse subMenu" id="collapseDashboard">
+          <ul>
+            <li><a href="#" class="subItemMenu"> Dash 1</a></li>
+            <li><a href="users" class="subItemMenu"> Dash 2</a></li>
+            <li><a href="#" class="subItemMenu"> Dash 3</a></li>
+          </ul>
+        </div>
+      </li>
+
+      <!-- Submenu 2: Admin -->
+      <li class="itemMenu">
+        <a class="menuLink d-flex align-items-center" data-bs-toggle="collapse" href="#collapseAdmin" role="button"
+           aria-expanded="false" aria-controls="collapseAdmin">
+          <i class="bi bi-person-fill-slash iconMenu"></i>
+          <span class="menuText">Admin</span>
+          <i id="arrowAdmin" class="bi bi-chevron-right ms-2 arrowIcon"></i>
+        </a>
+        <div class="collapse subMenu" id="collapseAdmin">
+          <ul>
+            <li><a href="#" class="subItemMenu">Permissões</a></li>
+            <li><a href="users" class="subItemMenu">Usuários</a></li>
+            <li><a href="#" class="subItemMenu">Tema</a></li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="itemMenu">
+        <a href="#">
+          <i class="bi bi-envelope iconMenu"></i>
+          <span class="menuText">Contato</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="rodapeUsuario">
+      <div class="usuarioInfo">
+        <img src="https://picsum.photos/50" alt="Perfil" class="fotoPerfil">
+        <span class="nomeUsuario">
+          {% if current_user %}
+            {{ current_user.name }}
+          {% else %}
+            Usuário não logado
+          {% endif %}
+        </span>
+      </div>
+      <br>
+      <a href="/logout" class="logoutLink">
+        <i class="bi bi-box-arrow-right iconMenu"></i>
+        <span class="menuText">Logout</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="conteudoPrincipal" id="conteudoPrincipal">
+    {% block conteudo %}
+    {% endblock conteudo %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
 </body>
 </html>
