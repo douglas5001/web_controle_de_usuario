@@ -1,32 +1,50 @@
-
 function toggleMenu() {
-    const sidebar = document.getElementById('sidebar')
-    const content = document.getElementById('conteudoPrincipal')
-    const icon = document.getElementById('toggleIcon')
-    const logo = document.getElementById('empresaLogo')
-  
-    sidebar.classList.toggle('active')
-    content.classList.toggle('active')
-  
-    const isActive = sidebar.classList.contains('active')
-    icon.className = isActive ? 'bi bi-chevron-left' : 'bi bi-chevron-right'
-    logo.style.display = isActive ? 'inline-block' : 'none'
+  const menuLateral = document.getElementById('sidebar');
+  const conteudoPrincipal = document.getElementById('conteudoPrincipal');
+  const iconeToggle = document.getElementById('toggleIcon');
+  const logoEmpresa = document.getElementById('empresaLogo');
+
+  menuLateral.classList.toggle('active');
+  conteudoPrincipal.classList.toggle('active');
+
+  const menuAberto = menuLateral.classList.contains('active');
+  iconeToggle.className = menuAberto ? 'bi bi-chevron-left' : 'bi bi-chevron-right';
+  logoEmpresa.style.display = menuAberto ? 'inline-block' : 'none';
+
+  localStorage.setItem('menuAberto', menuAberto);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const menuLateral = document.getElementById('sidebar');
+  const conteudoPrincipal = document.getElementById('conteudoPrincipal');
+  const iconeToggle = document.getElementById('toggleIcon');
+  const logoEmpresa = document.getElementById('empresaLogo');
+
+  const menuAbertoStorage = localStorage.getItem('menuAberto') === 'true';
+
+  if (menuAbertoStorage) {
+    menuLateral.classList.add('active');
+    conteudoPrincipal.classList.add('active');
+    iconeToggle.className = 'bi bi-chevron-left';
+    logoEmpresa.style.display = 'inline-block';
+  } else {
+    menuLateral.classList.remove('active');
+    conteudoPrincipal.classList.remove('active');
+    iconeToggle.className = 'bi bi-chevron-right';
+    logoEmpresa.style.display = 'none';
   }
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    // Exemplo de submenus
-    const dashCollapse = document.getElementById('collapseDashboard')
-    const dashArrow = document.getElementById('arrowDashboard')
-    if (dashCollapse && dashArrow) {
-      dashCollapse.addEventListener('show.bs.collapse', () => dashArrow.classList.add('rotate'))
-      dashCollapse.addEventListener('hide.bs.collapse', () => dashArrow.classList.remove('rotate'))
-    }
-  
-    const adminCollapse = document.getElementById('collapseAdmin')
-    const adminArrow = document.getElementById('arrowAdmin')
-    if (adminCollapse && adminArrow) {
-      adminCollapse.addEventListener('show.bs.collapse', () => adminArrow.classList.add('rotate'))
-      adminCollapse.addEventListener('hide.bs.collapse', () => adminArrow.classList.remove('rotate'))
-    }
-  })
-  
+
+  const dashboardCollapse = document.getElementById('collapseDashboard');
+  const dashboardSeta = document.getElementById('arrowDashboard');
+  if (dashboardCollapse && dashboardSeta) {
+    dashboardCollapse.addEventListener('show.bs.collapse', () => dashboardSeta.classList.add('rotate'));
+    dashboardCollapse.addEventListener('hide.bs.collapse', () => dashboardSeta.classList.remove('rotate'));
+  }
+
+  const adminCollapse = document.getElementById('collapseAdmin');
+  const adminSeta = document.getElementById('arrowAdmin');
+  if (adminCollapse && adminSeta) {
+    adminCollapse.addEventListener('show.bs.collapse', () => adminSeta.classList.add('rotate'));
+    adminCollapse.addEventListener('hide.bs.collapse', () => adminSeta.classList.remove('rotate'));
+  }
+});

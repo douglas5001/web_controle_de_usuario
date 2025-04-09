@@ -1,18 +1,32 @@
+import csv
+import io
 from flask import Blueprint, render_template, redirect, request, url_for, jsonify, make_response
 from schema.user_schema import UserSchema
 from service.user_service import list_user, create_user, delete_user, list_user_id, update_user
 from service.profile_service import list_profiles, get_profile_by_id
-from permission_required import permission_required
+#from permission_required import permission_required
 from model.user_model import User
 
 user_bp = Blueprint("user", __name__)
 
 @user_bp.route("/users")
-@permission_required("rota_listar_usuarios")
 def get_user():
-    users = list_user()
-    users_data = UserSchema(many=True).dump(users)
-    return render_template("user/users.html", users=users_data)
+    page = request.args.get("page", 1, type=int)
+    search = request.args.get("search", "")
+    field = request.args.get("field", "name")
+    per_page = 3
+    users_paginated = list_user(page, per_page, search, field)
+    users_serialized = UserSchema(many=True).dump(users_paginated.items)
+    profiles = list_profiles()
+    return render_template(
+        "user/users.html",
+        users=users_serialized,
+        profiles=profiles,
+        search=search,
+        field=field,
+        page=page,
+        total_pages=users_paginated.pages
+    )
 
 @user_bp.route("/register", methods=["GET", "POST"])
 def register_user():
@@ -32,7 +46,7 @@ def register_user():
         errors = us.validate(data)
         if errors:
             profiles = list_profiles()
-            return render_template("user/register.html", errors=errors, profiles=profiles)
+            return render_template("user/users.html", errors=errors, profiles=profiles)
 
         new_user = User(
             name=data["name"],
@@ -74,3 +88,22 @@ def put_user(id):
     )
     update_user(user_db, new_user)
     return redirect(url_for("user.get_user"))
+
+
+@user_bp.route("/users/excel")
+def users_excel():
+    page = request.args.get("page", 1, type=int)
+    search = request.args.get("search", "")
+    per_page = 999999
+    users_paginated = list_user(page, per_page, search)
+    output = io.StringIO()
+    writer = csv.writer(output, delimiter=';')
+    writer.writerow(["ID", "Nome", "Email", "Admin", "Perfil"])
+    for u in users_paginated.items:
+        perfil = u.profile.name if u.profile else "Sem Perfil"
+        writer.writerow([u.id, u.name, u.email, "Sim" if u.is_admin else "Não", perfil])
+    output.seek(0)
+    response = make_response(output.read())
+    response.headers["Content-Disposition"] = "attachment; filename=usuarios.csv"
+    response.headers["Content-type"] = "text/csv"
+    return response

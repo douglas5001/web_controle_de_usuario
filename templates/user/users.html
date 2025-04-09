@@ -1,37 +1,189 @@
 {% extends 'base.html' %}
 {% block conteudo %}
-<br>
-<br>
-<div class="container d-flex justify-content-center align-items-center">
-  <a href="{{ url_for('user.register_user') }}" class="btn btn-primary">Cadastrar usuario</a>
-</div>
-<br>
-<br>
-<div class="container text-center fw-bold">
+
+
+
+
+<div class="card-menu container">
+  <h3 class="text-center">Lista de Usuários</h3>
+
   
-  <table class="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Name</th>
-          <th scope="col">Email</th>
-          <th scope="col">Opções</th>
-        </tr>
-      </thead>
-          <tbody>
-          {% for user in users %}
-          <tr>
-              <td>{{ user.id }}</td>
-              <td>{{ user.name }}</td>
-              <td>{{ user.email }}</td>
-              <td>
-                <a href="{{ user.id }}/update_user" class="btn btn-secondary btn-xs">Editar</a>
-                <a href="{{user.id}}/remove_user" onclick="return confirm('Deseja excluir este registro?')" class="btn btn-danger btn-xs">Excluir</a>
-              </td>
-          </tr>
-          {% endfor %}
-          </tbody>
+  <div class="container mb-3 d-flex justify-content-center">
+    <div class="d-flex">
+      <form method="GET" action="{{ url_for('user.get_user') }}" class="d-flex">
+        <select name="field" class="form-select me-2" style="max-width: 150px;">
+          <option value="name" {% if field == 'name' %}selected{% endif %}>Nome</option>
+          <option value="email" {% if field == 'email' %}selected{% endif %}>Email</option>
+          <option value="profile" {% if field == 'profile' %}selected{% endif %}>Perfil</option>
+        </select>
+        <input type="text" name="search" class="form-control me-2" placeholder="Pesquisa" value="{{ search }}">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+      </form>
+    </div>
+  </div>
+  
+  <div class="container text-center">
+    <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modalCadastroUsuario">
+      Cadastrar usuário
+    </button>
+    <button id="btnEditar" type="button" class="btn btn-secondary mb-2" data-bs-toggle="modal" data-bs-target="#modalEdicaoUsuario" disabled>
+      Editar
+    </button>
+    <button id="btnExcluir" type="button" class="btn btn-danger mb-2" disabled>
+      Excluir
+    </button>
+  </div>
+
+
+
+
+  <div class="d-flex justify-content-end mb-2" style="padding: 0 15px;">
+    <a href="{{ url_for('user.users_excel', search=search, field=field) }}" class="btn btn-success">
+      Exportar Excel
+    </a>
+  </div>
+  
+  <table class="table table-striped table-hover table-compact" id="tabelaUsuarios">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Perfil</th>
+        <th>Admin</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for usuario in users %}
+      <tr data-id="{{ usuario.id }}"
+          data-name="{{ usuario.name }}"
+          data-email="{{ usuario.email }}"
+          data-is-admin="{{ usuario.is_admin }}"
+          data-profile-name="{{ usuario.profile.name if usuario.profile else 'Sem Perfil' }}">
+        <td>{{ usuario.id }}</td>
+        <td>{{ usuario.name }}</td>
+        <td>{{ usuario.email }}</td>
+        <td>{{ usuario.profile.name if usuario.profile else 'Sem Perfil' }}</td>
+        <td>{{ usuario.is_admin }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
   </table>
+
+
+  <div class="container d-flex justify-content-center mt-3">
+    <nav aria-label="Paginação">
+      <ul class="pagination">
+        {% if page > 1 %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page - 1 }}&search={{ search }}&field={{ field }}">Anterior</a>
+        </li>
+        {% endif %}
+        {% for p in range(1, total_pages+1) %}
+        <li class="page-item {% if p == page %}active{% endif %}">
+          <a class="page-link" href="?page={{ p }}&search={{ search }}&field={{ field }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+        {% if page < total_pages %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page + 1 }}&search={{ search }}&field={{ field }}">Próximo</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+
 </div>
+
+
+
+<div class="modal fade" id="modalEdicaoUsuario" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title">Alteração de cadastro de usuário</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" id="edicaoId">
+          <div class="mb-3">
+            <label for="edicaoNome">Nome</label>
+            <input type="text" class="form-control" id="edicaoNome" name="name">
+          </div>
+          <div class="mb-3">
+            <label for="edicaoEmail">Email</label>
+            <input type="email" class="form-control" id="edicaoEmail" name="email">
+          </div>
+          <div class="mb-3">
+            <label for="edicaoSenha">Password</label>
+            <input type="password" class="form-control" id="edicaoSenha" name="password">
+          </div>
+          <div class="mb-3">
+            <label for="edicaoAdmin">Admin</label>
+            <select class="form-control" id="edicaoAdmin" name="is_admin">
+              <option value="none">Não Definido</option>
+              <option value="false">False</option>
+              <option value="true">True</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Salvar</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalCadastroUsuario" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="{{ url_for('user.register_user') }}" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title">Cadastro de Usuário</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="cadastroNome">Nome</label>
+            <input type="text" class="form-control" id="cadastroNome" name="name" placeholder="Nome">
+          </div>
+          <div class="mb-3">
+            <label for="cadastroEmail">Email</label>
+            <input type="email" class="form-control" id="cadastroEmail" name="email" placeholder="Email">
+          </div>
+          <div class="mb-3">
+            <label for="cadastroSenha">Senha</label>
+            <input type="password" class="form-control" id="cadastroSenha" name="password" placeholder="Senha">
+          </div>
+          <div class="mb-3">
+            <label for="cadastroAdmin">Admin</label>
+            <select class="form-control" id="cadastroAdmin" name="is_admin">
+              <option value="false" selected>False</option>
+              <option value="true">True</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="profile_id">Perfil</label>
+            <select class="form-control" id="profile_id" name="profile_id">
+              <option value="">Selecione um perfil</option>
+              {% for p in profiles %}
+              <option value="{{ p.id }}">{{ p.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Cadastrar</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/users.js') }}"></script>
 
 {% endblock conteudo %}

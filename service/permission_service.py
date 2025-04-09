@@ -17,6 +17,4 @@ def user_has_permission(user, route_name):
         return True
     if not user.profile:
         return False
-    return bool(
-        user.profile.permissions.filter_by(route_name=route_name).first()
-    )
+    return any(permission.route_name == route_name for permission in user.profile.permissions)

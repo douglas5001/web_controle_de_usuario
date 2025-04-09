@@ -45,7 +45,7 @@ def dashboard():
     token = jwt.encode(payload, METABASE_SECRET_KEY, algorithm="HS256")
     iframe_url = f"{METABASE_SITE_URL}/embed/dashboard/{token}#bordered=true&titled=true"
 
-    return render_template("dashboard.html", grafico=grafico_html, iframe_url=iframe_url)
+    return render_template("dashboards/dashboard.html", grafico=grafico_html, iframe_url=iframe_url)
 
 
 @notification_gcpj_pb.route("/notificacoes")

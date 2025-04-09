@@ -6,11 +6,14 @@
   <title>web Test</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/table.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/menu.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/card.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/table.css') }}">
+  
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/iframe.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/card-menu.css') }}">
 </head>
 <body>
   <button class="menu-toggle" onclick="toggleMenu()" id="toggleButton">
@@ -25,18 +28,6 @@
         <a href="/">
           <i class="bi bi-house iconMenu"></i>
           <span class="menuText">Home</span>
-        </a>
-      </li>
-      <li class="itemMenu">
-        <a href="users">
-          <i class="bi bi-bar-chart-line iconMenu"></i>
-          <span class="menuText">User</span>
-        </a>
-      </li>
-      <li class="itemMenu">
-        <a href="register">
-          <i class="bi bi-person-plus iconMenu"></i>
-          <span class="menuText">Cadastro</span>
         </a>
       </li>
 
@@ -57,21 +48,11 @@
         </div>
       </li>
 
-      <!-- Submenu 2: Admin -->
       <li class="itemMenu">
-        <a class="menuLink d-flex align-items-center" data-bs-toggle="collapse" href="#collapseAdmin" role="button"
-           aria-expanded="false" aria-controls="collapseAdmin">
-          <i class="bi bi-person-fill-slash iconMenu"></i>
+        <a href="admin_settings">
+          <i class="bi bi-person-plus iconMenu"></i>
           <span class="menuText">Admin</span>
-          <i id="arrowAdmin" class="bi bi-chevron-right ms-2 arrowIcon"></i>
         </a>
-        <div class="collapse subMenu" id="collapseAdmin">
-          <ul>
-            <li><a href="#" class="subItemMenu">Permissões</a></li>
-            <li><a href="users" class="subItemMenu">Usuários</a></li>
-            <li><a href="#" class="subItemMenu">Tema</a></li>
-          </ul>
-        </div>
       </li>
 
       <li class="itemMenu">

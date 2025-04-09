@@ -1,31 +1,25 @@
-.custom-table {
-    background-color: #ffffff;
-    color: #333;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    border-radius: 12px;
-    overflow: hidden;
+.card-menu {
+  padding: 10px;
+  overflow-x: auto;
 }
 
-.custom-table thead {
-    background-color: #f8f9fa;
-    font-weight: bold;
-    border-bottom: 2px solid #dee2e6;
+.table-compact {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
 }
 
-.custom-table thead th {
-    padding: 12px;
+.table-compact th,
+.table-compact td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: left;
 }
 
-.custom-table tbody td {
-    padding: 10px 12px;
-    vertical-align: middle;
+.table-compact th {
+  background-color: #5f5f5fd1;
+  font-weight: bold;
 }
 
-.table-responsive {
-    overflow-x: auto;
-}
 
-.custom-table tr:hover {
-    background-color: #f1f1f1;
-}
+
