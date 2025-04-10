@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<div class="card-menu">
+    <h3 class="text-center">Gerenciamento Financeiro</h3>
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-4 mt-4">
+      <div class="col">
+        <a href="rules" class="text-decoration-none text-dark">
+          <div class="opcao-admin d-flex flex-column align-items-center">
+            <i class="bi bi-arrow-left-right fs-1"></i>
+            <p class="mt-2">Regras</p>
+          </div>
+        </a>
+      </div>
+      <div class="col">
+        <a href="relatorio_financeiro" class="text-decoration-none text-dark">
+          <div class="opcao-admin d-flex flex-column align-items-center">
+            <i class="bi bi-archive fs-1"></i>
+            <p class="mt-2">Relatorios</p>
+          </div>
+        </a>
+      </div>
+      <div class="col">
+        <a href="#" class="text-decoration-none text-dark">
+          <div class="opcao-admin d-flex flex-column align-items-center">
+            <i class="bi bi-gear fs-1"></i>
+            <p class="mt-2">Configurações</p>
+          </div>
+        </a>
+      </div>
+      <div class="col">
+        <a href="#" class="text-decoration-none text-dark">
+          <div class="opcao-admin d-flex flex-column align-items-center">
+            <i class="bi bi-file-earmark-text fs-1"></i>
+            <p class="mt-2">Relatórios</p>
+          </div>
+        </a>
+      </div>
+      <div class="col">
+        <a href="#" class="text-decoration-none text-dark">
+          <div class="opcao-admin d-flex flex-column align-items-center">
+            <i class="bi bi-lock fs-1"></i>
+            <p class="mt-2">Permissões</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endblock conteudo %}

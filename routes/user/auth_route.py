@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, make_response
 from flask_jwt_extended import create_access_token, get_jwt_identity, verify_jwt_in_request
 from app import jwt
-from service.user_service import list_user_email, list_user_id
+from service.user.user_service import list_user_email, list_user_id
 from flask import g
 auth_bp = Blueprint("auth", __name__)
 

@@ -12,3 +12,8 @@
 .card-grafico:hover {
     transform: translateY(-5px);
 }
+
+
+.container-filters {
+    background-color: aqua;
+  }

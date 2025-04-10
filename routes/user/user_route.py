@@ -1,9 +1,9 @@
 import csv
 import io
 from flask import Blueprint, render_template, redirect, request, url_for, jsonify, make_response
-from schema.user_schema import UserSchema
-from service.user_service import list_user, create_user, delete_user, list_user_id, update_user
-from service.profile_service import list_profiles, get_profile_by_id
+from schema.user.user_schema import UserSchema
+from service.user.user_service import list_user, create_user, delete_user, list_user_id, update_user
+from service.user.profile_service import list_profiles, get_profile_by_id
 #from permission_required import permission_required
 from model.user_model import User
 

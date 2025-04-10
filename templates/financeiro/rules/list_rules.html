@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<div class="card-menu container">
+  <h2 class="text-center">Lista de Regras</h2>
+  
+  <div class="container mb-3 d-flex justify-content-center">
+    <form method="GET" action="{{ url_for('rule.get_rules') }}" class="d-flex">
+      <select name="field" class="form-select me-2" style="max-width: 150px;">
+        <option value="name" {% if campo_busca == 'name' %}selected{% endif %}>Nome</option>
+        <option value="description" {% if campo_busca == 'description' %}selected{% endif %}>Descrição</option>
+      </select>
+      <input type="text" name="search" class="form-control me-2" placeholder="Pesquisar" value="{{ busca }}">
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+  </div>
+  
+  <div class="container text-center mb-3">
+    <a href="{{ url_for('rule.new_rule') }}" class="btn btn-primary">Nova Regra</a>
+    <button id="btnEditar" type="button" class="btn btn-secondary" disabled>Editar</button>
+    <button id="btnRemover" type="button" class="btn btn-danger" disabled>Remover</button>
+  </div>
+  
+  {% if rules %}
+  <div style="overflow-x: auto;">
+    <table class="table table-bordered table-striped" id="tabelaRegras" style="white-space: nowrap;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Descrição</th>
+          <th>Contrato</th>
+          <th>Obs</th>
+          <th>Verba</th>
+          <th>Data Financeiro</th>
+          <th>Valor Base</th>
+          <th>Valor Líquido</th>
+          <th>Descrição Extra</th>
+          <th>Plano de Contas</th>
+          <th>Criação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for regra in rules %}
+        <tr data-id="{{ regra.id }}"
+            data-name="{{ regra.name }}"
+            data-description="{{ regra.description }}"
+            data-contract="{{ regra.contract }}"
+            data-obs="{{ regra.obs }}"
+            data-verba="{{ regra.verba }}"
+            data-data_financeiro="{{ regra.data_financeiro }}"
+            data-valor_base="{{ regra.valor_base }}"
+            data-valor_liquido="{{ regra.valor_liquido }}"
+            data-descricao_extra="{{ regra.descricao_extra }}"
+            data-plano_de_contas="{{ regra.plano_de_contas }}"
+            data-created_at="{{ regra.created_at }}">
+          <td>{{ regra.id }}</td>
+          <td>{{ regra.name }}</td>
+          <td>{{ regra.description }}</td>
+          <td>{{ regra.contract }}</td>
+          <td>{{ regra.obs }}</td>
+          <td>{{ regra.verba }}</td>
+          <td>{{ regra.data_financeiro }}</td>
+          <td>{{ regra.valor_base }}</td>
+          <td>{{ regra.valor_liquido }}</td>
+          <td>{{ regra.descricao_extra }}</td>
+          <td>{{ regra.plano_de_contas }}</td>
+          <td>{{ regra.created_at }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="container d-flex justify-content-center mt-3">
+    <nav aria-label="Paginação">
+      <ul class="pagination">
+        {% if pagina > 1 %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ pagina - 1 }}&search={{ busca }}&field={{ campo_busca }}">Anterior</a>
+        </li>
+        {% endif %}
+        {% for p in range(1, total_paginas+1) %}
+        <li class="page-item {% if p == pagina %}active{% endif %}">
+          <a class="page-link" href="?page={{ p }}&search={{ busca }}&field={{ campo_busca }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+        {% if pagina < total_paginas %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ pagina + 1 }}&search={{ busca }}&field={{ campo_busca }}">Próximo</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+  {% else %}
+    <div class="alert alert-warning text-center">Nenhuma regra encontrada.</div>
+  {% endif %}
+</div>
+
+<script>
+const corpoTabela = document.querySelector('#tabelaRegras tbody')
+const botaoEditar = document.getElementById('btnEditar')
+const botaoRemover = document.getElementById('btnRemover')
+let linhaSelecionada = null
+
+corpoTabela.addEventListener('click', evento => {
+  const linha = evento.target.closest('tr')
+  if (!linha) return
+  if (linhaSelecionada !== linha) {
+    if (linhaSelecionada) linhaSelecionada.classList.remove('table-active')
+    linhaSelecionada = linha
+    linhaSelecionada.classList.add('table-active')
+  } else {
+    linhaSelecionada.classList.remove('table-active')
+    linhaSelecionada = null
+  }
+  botaoEditar.disabled = !linhaSelecionada
+  botaoRemover.disabled = !linhaSelecionada
+})
+
+botaoEditar.addEventListener('click', () => {
+  if (!linhaSelecionada) return
+  const idRegra = linhaSelecionada.getAttribute('data-id')
+  window.location.href = `/rules/edit/${idRegra}`
+})
+
+botaoRemover.addEventListener('click', () => {
+  if (!linhaSelecionada) return
+  const idRegra = linhaSelecionada.getAttribute('data-id')
+  if (confirm('Deseja excluir esta regra?')) {
+    window.location.href = `/rules/remove/${idRegra}`
+  }
+})
+</script>
+{% endblock conteudo %}

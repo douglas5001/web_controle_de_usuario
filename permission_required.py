@@ -1,8 +1,8 @@
 from functools import wraps
 from flask import make_response, jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
-from service.user_service import list_user_id
-from service.permission_service import user_has_permission
+from service.user.user_service import list_user_id
+from service.user.permission_service import user_has_permission
 
 def permission_required(route_name):
     def decorator(fn):

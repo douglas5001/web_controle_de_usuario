@@ -1,7 +1,7 @@
 from app import ma
 from model.user_model import User, Task
 from marshmallow import fields
-from schema.profile_schema import ProfileSchema
+from schema.user.profile_schema import ProfileSchema
 
 class TaskSchema(ma.SQLAlchemyAutoSchema):
     class Meta:

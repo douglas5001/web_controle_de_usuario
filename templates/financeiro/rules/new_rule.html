@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<div class="card-menu">
+  <h2>Nova Regra</h2>
+  <form id="rule-form" action="{{ url_for('rule.new_rule') }}" method="post">
+    <!-- Dados básicos -->
+    <div class="mb-3">
+      <label for="name" class="form-label">Nome</label>
+      <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Descrição</label>
+      <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+    </div>
+    <!-- Contrato -->
+    <div class="mb-3">
+      <label for="contract" class="form-label">Contrato</label>
+      <input type="text" class="form-control" id="contract" name="contract" required>
+    </div>
+    <!-- Campos de transformação -->
+    <div class="mb-3">
+      <label for="obs" class="form-label">Observação (obs)</label>
+      <textarea class="form-control" id="obs" name="obs" rows="2"></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="verba" class="form-label">Verba</label>
+      <input type="text" class="form-control" id="verba" name="verba">
+    </div>
+    <!-- excluir -->
+    <div class="mb-3">
+      <label for="data_financeiro" class="form-label">Data Financeiro</label>
+      <select class="form-select" id="data_financeiro" name="data_financeiro">
+        <option value="">-- Selecione --</option>
+        {% for honorario in honorarios %}
+          <option value="{{ honorario.campo }}">{{ honorario.campo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="valor_base" class="form-label">Valor Base</label>
+      <select class="form-select" id="valor_base" name="valor_base">
+        <option value="">-- Selecione --</option>
+        {% for honorario in honorarios %}
+          <option value="{{ honorario.campo }}">{{ honorario.campo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="valor_liquido" class="form-label">Valor Liquido</label>
+      <select class="form-select" id="valor_liquido" name="valor_liquido">
+        <option value="">-- Selecione --</option>
+        {% for honorario in honorarios %}
+          <option value="{{ honorario.campo }}">{{ honorario.campo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    
+    <div class="mb-3">
+      <label for="descricao_extra" class="form-label">Descrição (para lançamento)</label>
+      <input type="text" class="form-control" id="descricao_extra" name="descricao_extra">
+    </div>
+    <div class="mb-3">
+      <label for="plano_de_contas" class="form-label">Plano de Contas</label>
+      <input type="text" class="form-control" id="plano_de_contas" name="plano_de_contas">
+    </div>
+    <!-- Área de filtros dinâmicos -->  
+    <h4>Filtros</h4>
+    <div id="filters-container"></div>
+    <button type="button" id="add-filter" class="btn btn-primary mb-3">Adicionar Filtro</button>
+    <input class="container-filters" type="hidden" id="filters" name="filters">
+    
+    
+    <br><br>
+    <button type="submit" class="btn btn-success">Criar Regra</button>
+    <a href="{{ url_for('rule.get_rules') }}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+<script>
+  
+  const availableColumns = [
+    { value: "tarefa_id", label: "Tarefa Id" },
+    { value: "evento", label: "Evento" },
+    { value: "grupo_empresarial", label: "Grupo Empresarial" },
+    { value: "tipo_de_pasta", label: "Tipo de Pasta" },
+    { value: "situacao", label: "Situação" }
+  ];
+  const availableOperators = [
+    { value: "=", label: "=" },
+    { value: "!=", label: "!=" },
+    { value: "IN", label: "IN" },
+    { value: "NOT IN", label: "NOT IN" }
+  ];
+  let filtersArray = [];
+  function renderFilters() {
+    const container = document.getElementById("filters-container");
+    container.innerHTML = "";
+    filtersArray.forEach((filter, index) => {
+      const filterDiv = document.createElement("div");
+      filterDiv.className = "row mb-2 align-items-end";
+      filterDiv.innerHTML = `
+        <div class="col-md-4">
+          <label class="form-label">Coluna</label>
+          <select class="form-select" data-index="${index}" onchange="updateFilter(${index}, 'column_name', this.value)">
+            <option value="">-- Selecione --</option>
+            ${availableColumns.map(opt => `<option value="${opt.value}" ${filter.column_name === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('') }
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Operador</label>
+          <select class="form-select" data-index="${index}" onchange="updateFilter(${index}, 'operator', this.value)">
+            <option value="">-- Selecione --</option>
+            ${availableOperators.map(opt => `<option value="${opt.value}" ${filter.operator === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('') }
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Valor</label>
+          <input type="text" class="form-control" data-index="${index}" value="${filter.value || ''}" onchange="updateFilter(${index}, 'value', this.value)">
+        </div>
+        <div class="col-md-1">
+          <button type="button" class="btn btn-danger" onclick="removeFilter(${index})">X</button>
+        </div>
+      `;
+      container.appendChild(filterDiv);
+    });
+    document.getElementById("filters").value = JSON.stringify(filtersArray);
+  }
+  document.getElementById("add-filter").addEventListener("click", function() {
+    filtersArray.push({ column_name: "", operator: "", value: "" });
+    renderFilters();
+  });
+  function removeFilter(index) {
+    filtersArray.splice(index, 1);
+    renderFilters();
+  }
+  function updateFilter(index, key, value) {
+    filtersArray[index][key] = value;
+    document.getElementById("filters").value = JSON.stringify(filtersArray);
+  }
+  renderFilters();
+</script>
+{% endblock %}

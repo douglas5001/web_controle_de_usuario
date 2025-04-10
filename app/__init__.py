@@ -28,7 +28,7 @@ def create_app():
     def inject_current_user():
         try:
             # Importa aqui dentro para evitar ciclo
-            from service.user_service import list_user_id
+            from service.user.user_service import list_user_id
             verify_jwt_in_request(optional=True)
             user_id = get_jwt_identity()
             if user_id:

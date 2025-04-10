@@ -39,11 +39,15 @@ def delete_user(user_id):
 def update_user(previous_user, new_user):
     previous_user.name = new_user.name
     previous_user.email = new_user.email
-    previous_user.password = new_user.password
     previous_user.is_admin = new_user.is_admin
+
+    if new_user.password != previous_user.password:
+        previous_user.password = new_user.password
+        previous_user.encrypt_password()
     
     if new_user.profile_id:
         previous_user.profile_id = new_user.profile_id
+
     db.session.commit()
 
 def list_user_id(id):

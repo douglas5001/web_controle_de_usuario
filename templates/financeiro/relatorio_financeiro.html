@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<div class="card-menu text-center">
+  <h2 class="text-center">Relatório Financeiro</h2>
+  
+  <form method="GET" action="/relatorio_financeiro" class="mb-4">
+    <label>Filtrar por Contract:</label>
+    <select name="contract">
+      <option value="">Todos</option>
+      {% for contrato in todos_contratos %}
+      <option value="{{ contrato }}" {% if contrato == contrato_filtro %}selected{% endif %}>
+        {{ contrato }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <label>Selecione a Regra:</label>
+    <select name="regra_id">
+      <option value="">Escolha uma regra</option>
+      {% for regra in regras %}
+      <option value="{{ regra.id }}" {% if regra.id == regra_selecionada_id %}selected{% endif %}>
+        {{ regra.name }} - {{ regra.contract }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <button type="submit">Filtrar Regra</button>
+  </form>
+
+  {% if regra_selecionada_id and regra_atual %}
+    <div class="text-start mt-4 mb-4">
+      <h5>Filtros aplicados da regra: <strong>{{ regra_atual.name }}</strong></h5>
+      {% if regra_atual.filtros %}
+        <ul class="list-group">
+          {% for coluna, condicao in regra_atual.filtros.items() %}
+            <li class="list-group-item">
+              <strong>{{ coluna }}</strong> {{ condicao.operator }} {{ condicao.value }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p><em>Essa regra não possui filtros definidos.</em></p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if pastas %}
+    <div style="overflow-x: auto;">
+      <table class="table table-bordered table-striped" id="tabelaRegras" style="white-space: nowrap;">
+        <thead>
+          <tr>
+            <th>Tarefa_id</th>
+            <th>Pasta_id</th>
+            <th>Evento</th>
+            <th>Valor Causa</th>
+            <th>soma_valor_causa</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pasta in pastas %}
+          <tr>
+            <td>{{ pasta.tarefa_id }}</td>
+            <td>{{ pasta.pasta_id }}</td>
+            <td>{{ pasta.evento }}</td>
+            <td>{{ pasta.valor_da_causa }}</td>
+            <td>{{ pasta.soma_valor_causa }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    {% if regra_selecionada_id or contrato_filtro %}
+      <p>Nenhum dado encontrado para os filtros selecionados.</p>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

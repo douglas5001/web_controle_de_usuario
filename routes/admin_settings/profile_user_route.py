@@ -1,8 +1,8 @@
 import csv
 import io
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, make_response
-from schema.profile_schema import ProfileSchema
-from service.profile_service import list_profile_page, create_profile, get_profile_by_id, update_profile, delete_profile
+from schema.user.profile_schema import ProfileSchema
+from service.user.profile_service import list_profile_page, create_profile, get_profile_by_id, update_profile, delete_profile
 
 profile_bp = Blueprint("profile", __name__)
 

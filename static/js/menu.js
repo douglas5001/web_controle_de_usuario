@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     dashboardCollapse.addEventListener('hide.bs.collapse', () => dashboardSeta.classList.remove('rotate'));
   }
 
-  const adminCollapse = document.getElementById('collapseAdmin');
-  const adminSeta = document.getElementById('arrowAdmin');
+  const adminCollapse = document.getElementById('collapseFinanceiro');
+  const adminSeta = document.getElementById('arrowFinanceiro');
   if (adminCollapse && adminSeta) {
     adminCollapse.addEventListener('show.bs.collapse', () => adminSeta.classList.add('rotate'));
     adminCollapse.addEventListener('hide.bs.collapse', () => adminSeta.classList.remove('rotate'));
