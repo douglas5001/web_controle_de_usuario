@@ -29,4 +29,4 @@ COPY . .
 EXPOSE 8000
 
 # Comando para rodar o aplicativo
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "wsgi:app"]

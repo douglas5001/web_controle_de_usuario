@@ -76,12 +76,14 @@
         </div>
       </li>
 
+      {% if has_permission("admin") %}
       <li class="itemMenu">
         <a href="admin_settings">
           <i class="bi bi-person-plus iconMenu"></i>
           <span class="menuText">Admin</span>
         </a>
       </li>
+      {% endif %}
 
       <li class="itemMenu">
         <a href="#">
@@ -93,7 +95,15 @@
 
     <div class="rodapeUsuario">
       <div class="usuarioInfo">
-        <img src="https://picsum.photos/50" alt="Perfil" class="fotoPerfil">
+        <img
+          class="fotoPerfil"
+          alt="Perfil"
+          src="{% if current_user and current_user.avatar %}
+                 {{ current_user.avatar_url() }}
+               {% else %}
+                 {{ url_for('static', filename='assets/image/avatar_default.png') }}
+               {% endif %}"
+        >
         <span class="nomeUsuario">
           {% if current_user %}
             {{ current_user.name }}
@@ -102,12 +112,16 @@
           {% endif %}
         </span>
       </div>
+    
       <br>
+    
       <a href="#" class="logoutLink" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
         <i class="bi bi-box-arrow-right iconMenu"></i>
         <span class="menuText">Logout</span>
       </a>
     </div>
+
+
   </nav>
 
   <div class="modal fade" id="confirmLogoutModal" tabindex="-1" aria-labelledby="confirmLogoutLabel" aria-hidden="true">

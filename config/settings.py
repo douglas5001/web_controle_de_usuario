@@ -13,3 +13,12 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_TOKEN_LOCATION = ["cookies"]
     JWT_COOKIE_CSRF_PROTECT = False
+    
+    
+    ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+    UPLOAD_FOLDER = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..", "static", "uploads", "avatars"
+    )
+    
+    

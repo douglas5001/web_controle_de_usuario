@@ -1,10 +1,16 @@
 from app import db
 from model.permission_model import Permission
 
-def grant_permission_to_profile(profile_id, route_name):
-    permission = Permission(route_name=route_name, profile_id=profile_id)
-    db.session.add(permission)
+def grant_permission_to_profile(profile_id: int, route_name: str) -> Permission:
+    permissao_existente = Permission.query.filter_by(profile_id=profile_id, route_name=route_name).first()
+    
+    if permissao_existente:
+        return permissao_existente
+    
+    nova_permissao = Permission(profile_id=profile_id, route_name=route_name)
+    db.session.add(nova_permissao)
     db.session.commit()
+    return nova_permissao
 
 def revoke_permission_from_profile(profile_id, route_name):
     permission = Permission.query.filter_by(profile_id=profile_id, route_name=route_name).first()

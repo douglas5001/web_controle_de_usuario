@@ -5,99 +5,44 @@
   <h3 class="text-center">Lista de Perfis</h3>
 
   <div class="container mb-3 d-flex justify-content-center">
-    <div class="d-flex">
-      <form method="GET" action="{{ url_for('profile.list_profiles_route') }}" class="d-flex">
-        <select name="field" class="form-select me-2" style="max-width: 150px;">
-          <option value="name" {% if campo == 'name' %}selected{% endif %}>Nome</option>
-        </select>
-        <input type="text" name="search" class="form-control me-2" placeholder="Pesquisa" value="{{ busca }}">
-        <button type="submit" class="btn btn-primary">Buscar</button>
-      </form>
-    </div>
+    <form method="GET" action="{{ url_for('profile.list_profiles_route') }}" class="d-flex">
+      <select name="field" class="form-select me-2" style="max-width: 150px;">
+        <option value="name" {% if campo == 'name' %}selected{% endif %}>Nome</option>
+      </select>
+      <input type="text" name="search" class="form-control me-2" placeholder="Pesquisa" value="{{ busca }}">
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
   </div>
 
   <div class="container text-center">
-    <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modalCadastroPerfil">
-      Cadastrar perfil
-    </button>
-    <button id="btnEditarPerfil" type="button" class="btn btn-secondary mb-2" data-bs-toggle="modal" data-bs-target="#modalEdicaoPerfil" disabled>
-      Editar
-    </button>
-    <button id="btnExcluirPerfil" type="button" class="btn btn-danger mb-2" disabled>
-      Excluir
-    </button>
-  </div>
-
-  <div class="d-flex justify-content-end mb-2" style="padding: 0 15px;">
-    <a href="{{ url_for('profile.export_profiles_excel', search=busca, field=campo) }}" class="btn btn-success">
-      Exportar Excel
-    </a>
+    <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modalCadastroPerfil">Cadastrar perfil</button>
+    <button id="btnEditarPerfil" type="button" class="btn btn-secondary mb-2" data-bs-toggle="modal" data-bs-target="#modalEdicaoPerfil" disabled>Editar</button>
+    <button id="btnExcluirPerfil" type="button" class="btn btn-danger mb-2" disabled>Excluir</button>
   </div>
 
   <table class="table table-striped table-hover table-compact" id="tabelaPerfis">
     <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nome</th>
-      </tr>
+      <tr><th>ID</th><th>Nome</th><th>Permissões</th></tr>
     </thead>
     <tbody>
       {% for perfil in perfis %}
-      <tr data-id="{{ perfil.id }}" data-name="{{ perfil.name }}">
+      <tr data-id="{{ perfil.id }}" data-name="{{ perfil.name }}" data-permissoes='{{ perfil.permissions | tojson }}'>
         <td>{{ perfil.id }}</td>
         <td>{{ perfil.name }}</td>
+        <td>
+          {% for p in perfil.permissions %}
+            <span class="badge bg-secondary">{{ p.route_name }}</span>
+          {% endfor %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-
-  <div class="container d-flex justify-content-center mt-3">
-    <nav aria-label="Paginação">
-      <ul class="pagination">
-        {% if pagina > 1 %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ pagina - 1 }}&search={{ busca }}&field={{ campo }}">Anterior</a>
-        </li>
-        {% endif %}
-        {% for p in range(1, total_paginas+1) %}
-        <li class="page-item {% if p == pagina %}active{% endif %}">
-          <a class="page-link" href="?page={{ p }}&search={{ busca }}&field={{ campo }}">{{ p }}</a>
-        </li>
-        {% endfor %}
-        {% if pagina < total_paginas %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ pagina + 1 }}&search={{ busca }}&field={{ campo }}">Próximo</a>
-        </li>
-        {% endif %}
-      </ul>
-    </nav>
-  </div>
 </div>
 
-<div class="modal fade" id="modalEdicaoPerfil" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <form action="" method="POST">
-        <div class="modal-header">
-          <h5 class="modal-title">Alteração de cadastro de perfil</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" name="id" id="edicaoPerfilId">
-          <div class="mb-3">
-            <label for="edicaoPerfilNome">Nome</label>
-            <input type="text" class="form-control" id="edicaoPerfilNome" name="nome">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Salvar</button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+<datalist id="datalistPermissoesExistentes"></datalist>
 
+<!-- MODAL CADASTRO PERFIL -->
 <div class="modal fade" id="modalCadastroPerfil" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -111,9 +56,52 @@
             <label for="cadastroPerfilNome">Nome</label>
             <input type="text" class="form-control" id="cadastroPerfilNome" name="nome" placeholder="Nome">
           </div>
+          <div class="mb-3">
+            <label for="novaPermissao">Adicionar Permissão (rota)</label>
+            <div class="d-flex">
+              <input type="text" class="form-control me-2" id="novaPermissao" list="datalistPermissoesExistentes" placeholder="ex: dashboard">
+              <button type="button" class="btn btn-success" id="btnAdicionarPermissao">Adicionar</button>
+            </div>
+          </div>
+          <ul id="listaPermissoes" class="list-group mb-3"></ul>
+          <input type="hidden" name="permissoes" id="permissoesSelecionadas">
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Cadastrar</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIÇÃO PERFIL -->
+<div class="modal fade" id="modalEdicaoPerfil" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title">Edição de Perfil</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" id="edicaoPerfilId">
+          <div class="mb-3">
+            <label for="edicaoPerfilNome">Nome</label>
+            <input type="text" class="form-control" id="edicaoPerfilNome" name="nome">
+          </div>
+          <div class="mb-3">
+            <label for="novaPermissaoEdicao">Permissões</label>
+            <div class="d-flex">
+              <input type="text" class="form-control me-2" id="novaPermissaoEdicao" list="datalistPermissoesExistentes" placeholder="ex: dashboard">
+              <button type="button" class="btn btn-success" id="btnAdicionarPermissaoEdicao">Adicionar</button>
+            </div>
+          </div>
+          <ul id="listaPermissoesEdicao" class="list-group mb-3"></ul>
+          <input type="hidden" name="permissoes" id="permissoesSelecionadasEdicao">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Salvar</button>
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
         </div>
       </form>
@@ -143,13 +131,19 @@
   })
 
   botaoEditarPerfil.addEventListener('click', () => {
-  if (!linhaPerfilSelecionada) return
-  const idPerfil = linhaPerfilSelecionada.getAttribute('data-id')
-  const nomePerfil = linhaPerfilSelecionada.getAttribute('data-name')
-  const formularioEdicao = document.querySelector('#modalEdicaoPerfil form')
-  formularioEdicao.action = `/profile/${idPerfil}/update`
-  document.getElementById('edicaoPerfilId').value = idPerfil
-  document.getElementById('edicaoPerfilNome').value = nomePerfil
+    if (!linhaPerfilSelecionada) return
+    const idPerfil = linhaPerfilSelecionada.getAttribute('data-id')
+    const nomePerfil = linhaPerfilSelecionada.getAttribute('data-name')
+    const permissoesPerfil = JSON.parse(linhaPerfilSelecionada.getAttribute('data-permissoes')) || []
+
+    const formularioEdicao = document.querySelector('#modalEdicaoPerfil form')
+    formularioEdicao.action = `/profile/${idPerfil}/update`
+    document.getElementById('edicaoPerfilId').value = idPerfil
+    document.getElementById('edicaoPerfilNome').value = nomePerfil
+
+    permissoesEdicao.length = 0
+    permissoesPerfil.forEach(p => permissoesEdicao.push(p.route_name))
+    atualizarListaPermissoesEdicao()
   })
 
   botaoExcluirPerfil.addEventListener('click', () => {
@@ -158,6 +152,75 @@
     if (confirm('Deseja excluir este registro?')) {
       window.location.href = `/profile/${idPerfil}/remove`
     }
+  })
+
+  const listaPermissoes = document.getElementById('listaPermissoes')
+  const permissoesSelecionadasInput = document.getElementById('permissoesSelecionadas')
+  const permissoes = []
+
+  document.getElementById('btnAdicionarPermissao').addEventListener('click', () => {
+    const novaPermissao = document.getElementById('novaPermissao').value.trim()
+    if (novaPermissao && !permissoes.includes(novaPermissao)) {
+      permissoes.push(novaPermissao)
+      atualizarListaPermissoes()
+    }
+    document.getElementById('novaPermissao').value = ''
+  })
+
+  function atualizarListaPermissoes() {
+    listaPermissoes.innerHTML = ''
+    permissoes.forEach((permissao, index) => {
+      const item = document.createElement('li')
+      item.className = 'list-group-item d-flex justify-content-between align-items-center'
+      item.innerHTML = `${permissao}<button type="button" class="btn btn-sm btn-danger" onclick="removerPermissao(${index})">Remover</button>`
+      listaPermissoes.appendChild(item)
+    })
+    permissoesSelecionadasInput.value = JSON.stringify(permissoes)
+  }
+
+  function removerPermissao(index) {
+    permissoes.splice(index, 1)
+    atualizarListaPermissoes()
+  }
+
+  const listaPermissoesEdicao = document.getElementById('listaPermissoesEdicao')
+  const permissoesSelecionadasEdicao = document.getElementById('permissoesSelecionadasEdicao')
+  const permissoesEdicao = []
+
+  document.getElementById('btnAdicionarPermissaoEdicao').addEventListener('click', () => {
+    const novaPermissao = document.getElementById('novaPermissaoEdicao').value.trim()
+    if (novaPermissao && !permissoesEdicao.includes(novaPermissao)) {
+      permissoesEdicao.push(novaPermissao)
+      atualizarListaPermissoesEdicao()
+    }
+    document.getElementById('novaPermissaoEdicao').value = ''
+  })
+
+  function atualizarListaPermissoesEdicao() {
+    listaPermissoesEdicao.innerHTML = ''
+    permissoesEdicao.forEach((permissao, index) => {
+      const item = document.createElement('li')
+      item.className = 'list-group-item d-flex justify-content-between align-items-center'
+      item.innerHTML = `${permissao}<button type="button" class="btn btn-sm btn-danger" onclick="removerPermissaoEdicao(${index})">Remover</button>`
+      listaPermissoesEdicao.appendChild(item)
+    })
+    permissoesSelecionadasEdicao.value = JSON.stringify(permissoesEdicao)
+  }
+
+  function removerPermissaoEdicao(index) {
+    permissoesEdicao.splice(index, 1)
+    atualizarListaPermissoesEdicao()
+  }
+
+  fetch('/profile/permissoes-existentes')
+  .then(res => res.json())
+  .then(permissoes => {
+    const datalist = document.getElementById('datalistPermissoesExistentes')
+    permissoes.forEach(p => {
+      const option = document.createElement('option')
+      option.value = p
+      datalist.appendChild(option)
+    })
   })
 </script>
 

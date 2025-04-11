@@ -7,4 +7,8 @@ class Profile(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(50), nullable=False)
-    permissions = db.relationship("Permission", back_populates="profile")
+    permissions = db.relationship(
+        "Permission",
+        back_populates="profile",
+        cascade="all, delete-orphan"
+    )

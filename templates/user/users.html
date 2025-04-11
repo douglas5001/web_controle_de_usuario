@@ -2,55 +2,64 @@
 {% block conteudo %}
 
 
-
+{% if request.args.get('aviso') %}
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div class="toast show bg-warning text-dark" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Atenção</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Fechar"></button>
+    </div>
+    <div class="toast-body">
+      {{ request.args.get('aviso') }}
+    </div>
+  </div>
+</div>
+{% endif %}
 
 <div class="card-menu container">
   <h3 class="text-center">Lista de Usuários</h3>
 
-  
+  <!-- filtros ---------------------------------------------------------------->
   <div class="container mb-3 d-flex justify-content-center">
-    <div class="d-flex">
-      <form method="GET" action="{{ url_for('user.get_user') }}" class="d-flex">
-        <select name="field" class="form-select me-2" style="max-width: 150px;">
-          <option value="name" {% if field == 'name' %}selected{% endif %}>Nome</option>
-          <option value="email" {% if field == 'email' %}selected{% endif %}>Email</option>
-          <option value="profile" {% if field == 'profile' %}selected{% endif %}>Perfil</option>
-        </select>
-        <input type="text" name="search" class="form-control me-2" placeholder="Pesquisa" value="{{ search }}">
-        <button type="submit" class="btn btn-primary">Buscar</button>
-      </form>
-    </div>
+    <form method="GET" action="{{ url_for('user.get_user') }}" class="d-flex">
+      <select name="field" class="form-select me-2" style="max-width: 150px;">
+        <option value="name"    {{ 'selected' if field == 'name'    }}>Nome</option>
+        <option value="email"   {{ 'selected' if field == 'email'   }}>Email</option>
+        <option value="profile" {{ 'selected' if field == 'profile' }}>Perfil</option>
+      </select>
+      <input type="text" name="search" class="form-control me-2"
+             placeholder="Pesquisa" value="{{ search }}">
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
   </div>
-  
+
+  <!-- botões ----------------------------------------------------------------->
   <div class="container text-center">
-    <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modalCadastroUsuario">
+    <button type="button" class="btn btn-primary mb-2"
+            data-bs-toggle="modal" data-bs-target="#modalCadastroUsuario">
       Cadastrar usuário
     </button>
-    <button id="btnEditar" type="button" class="btn btn-secondary mb-2" data-bs-toggle="modal" data-bs-target="#modalEdicaoUsuario" disabled>
+
+    <button id="btnEditar" type="button" class="btn btn-secondary mb-2"
+            data-bs-toggle="modal" data-bs-target="#modalEdicaoUsuario" disabled>
       Editar
     </button>
+
     <button id="btnExcluir" type="button" class="btn btn-danger mb-2" disabled>
       Excluir
     </button>
   </div>
 
-
-
-
-  <div class="d-flex justify-content-end mb-2" style="padding: 0 15px;">
-    <a href="{{ url_for('user.users_excel', search=search, field=field) }}" class="btn btn-success">
-      Exportar Excel
-    </a>
+  <div class="d-flex justify-content-end mb-2" style="padding:0 15px;">
+    <a href="{{ url_for('user.users_excel', search=search, field=field) }}"
+       class="btn btn-success">Exportar Excel</a>
   </div>
-  
+
+  <!-- tabela ----------------------------------------------------------------->
   <table class="table table-bordered table-striped" id="tabelaUsuarios">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Nome</th>
-        <th>Email</th>
-        <th>Perfil</th>
-        <th>Admin</th>
+        <th>ID</th><th>Foto</th><th>Nome</th><th>Email</th><th>Perfil</th><th>Admin</th>
       </tr>
     </thead>
     <tbody>
@@ -59,8 +68,14 @@
           data-name="{{ usuario.name }}"
           data-email="{{ usuario.email }}"
           data-is-admin="{{ usuario.is_admin }}"
+          data-profile-id="{{ usuario.profile_id or '' }}"
           data-profile-name="{{ usuario.profile.name if usuario.profile else 'Sem Perfil' }}">
         <td>{{ usuario.id }}</td>
+        <td>
+          <img src="{{ usuario.avatar_url() if usuario.avatar else
+                      url_for('static', filename='uploads/avatars/default.png') }}"
+               class="rounded-circle" style="width:40px;height:40px;" alt="avatar">
+        </td>
         <td>{{ usuario.name }}</td>
         <td>{{ usuario.email }}</td>
         <td>{{ usuario.profile.name if usuario.profile else 'Sem Perfil' }}</td>
@@ -70,64 +85,99 @@
     </tbody>
   </table>
 
-
+  <!-- paginação ------------------------------------------------------------->
   <div class="container d-flex justify-content-center mt-3">
     <nav aria-label="Paginação">
       <ul class="pagination">
         {% if page > 1 %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page - 1 }}&search={{ search }}&field={{ field }}">Anterior</a>
-        </li>
+          <li class="page-item">
+            <a class="page-link"
+               href="?page={{ page-1 }}&search={{ search }}&field={{ field }}">Anterior</a>
+          </li>
         {% endif %}
         {% for p in range(1, total_pages+1) %}
-        <li class="page-item {% if p == page %}active{% endif %}">
-          <a class="page-link" href="?page={{ p }}&search={{ search }}&field={{ field }}">{{ p }}</a>
-        </li>
+          <li class="page-item {{ 'active' if p == page }}">
+            <a class="page-link"
+               href="?page={{ p }}&search={{ search }}&field={{ field }}">{{ p }}</a>
+          </li>
         {% endfor %}
         {% if page < total_pages %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page + 1 }}&search={{ search }}&field={{ field }}">Próximo</a>
-        </li>
+          <li class="page-item">
+            <a class="page-link"
+               href="?page={{ page+1 }}&search={{ search }}&field={{ field }}">Próximo</a>
+          </li>
         {% endif %}
       </ul>
     </nav>
   </div>
-
 </div>
 
-
-
+<!-- ======================= MODAL EDIÇÃO ===================================-->
 <div class="modal fade" id="modalEdicaoUsuario" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form action="" method="POST">
+      <form action="" method="POST" enctype="multipart/form-data">
         <div class="modal-header">
           <h5 class="modal-title">Alteração de cadastro de usuário</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
+
         <div class="modal-body">
           <input type="hidden" name="id" id="edicaoId">
+
           <div class="mb-3">
             <label for="edicaoNome">Nome</label>
             <input type="text" class="form-control" id="edicaoNome" name="name">
           </div>
+
           <div class="mb-3">
             <label for="edicaoEmail">Email</label>
             <input type="email" class="form-control" id="edicaoEmail" name="email">
           </div>
-          <div class="mb-3">
-            <label for="edicaoSenha">Password</label>
-            <input type="password" class="form-control" id="edicaoSenha" name="password">
+
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="switchAlterarSenha">
+            <label class="form-check-label" for="switchAlterarSenha">Alterar senha</label>
           </div>
+
+          <div class="mb-3">
+            <label for="edicaoSenha">Nova senha</label>
+            <input type="password" class="form-control" id="edicaoSenha"
+                   name="password" disabled>
+          </div>
+
           <div class="mb-3">
             <label for="edicaoAdmin">Admin</label>
-            <select class="form-control" id="edicaoAdmin" name="is_admin">
-              <option value="none">Não Definido</option>
+            <select class="form-control" id="edicaoAdmin" name="is_admin" required>
               <option value="false">False</option>
               <option value="true">True</option>
             </select>
           </div>
+
+          <!-- campo PERFIL -->
+          <div class="mb-3">
+            <label for="edicaoProfile">Perfil</label>
+            <select class="form-control" id="edicaoProfile" name="profile_id">
+              <option value="">Sem perfil</option>
+              {% for p in profiles %}
+                <option value="{{ p.id }}">{{ p.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="edicaoAvatar">Foto de perfil</label>
+            <input type="file" class="form-control" id="edicaoAvatar"
+                   name="avatar" accept="image/*">
+          </div>
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   id="removeAvatar" name="remove_avatar" value="true">
+            <label class="form-check-label" for="removeAvatar">Remover foto</label>
+          </div>
         </div>
+
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Salvar</button>
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
@@ -137,44 +187,61 @@
   </div>
 </div>
 
+<!-- ======================= MODAL CADASTRO =================================-->
 <div class="modal fade" id="modalCadastroUsuario" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form action="{{ url_for('user.register_user') }}" method="POST">
+      <form action="{{ url_for('user.register_user') }}" method="POST"
+            enctype="multipart/form-data">
         <div class="modal-header">
           <h5 class="modal-title">Cadastro de Usuário</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
+
         <div class="modal-body">
           <div class="mb-3">
             <label for="cadastroNome">Nome</label>
-            <input type="text" class="form-control" id="cadastroNome" name="name" placeholder="Nome">
+            <input type="text" class="form-control" id="cadastroNome"
+                   name="name" placeholder="Nome">
           </div>
+
           <div class="mb-3">
             <label for="cadastroEmail">Email</label>
-            <input type="email" class="form-control" id="cadastroEmail" name="email" placeholder="Email">
+            <input type="email" class="form-control" id="cadastroEmail"
+                   name="email" placeholder="Email">
           </div>
+
           <div class="mb-3">
             <label for="cadastroSenha">Senha</label>
-            <input type="password" class="form-control" id="cadastroSenha" name="password" placeholder="Senha">
+            <input type="password" class="form-control" id="cadastroSenha"
+                   name="password" placeholder="Senha">
           </div>
+
           <div class="mb-3">
             <label for="cadastroAdmin">Admin</label>
-            <select class="form-control" id="cadastroAdmin" name="is_admin">
+            <select class="form-control" id="cadastroAdmin" name="is_admin" required>
               <option value="false" selected>False</option>
               <option value="true">True</option>
             </select>
           </div>
+
+          <div class="mb-3">
+            <label for="cadastroAvatar">Foto de perfil</label>
+            <input type="file" class="form-control" id="cadastroAvatar"
+                   name="avatar" accept="image/*">
+          </div>
+
           <div class="mb-3">
             <label for="profile_id">Perfil</label>
             <select class="form-control" id="profile_id" name="profile_id">
               <option value="">Selecione um perfil</option>
               {% for p in profiles %}
-              <option value="{{ p.id }}">{{ p.name }}</option>
+                <option value="{{ p.id }}">{{ p.name }}</option>
               {% endfor %}
             </select>
           </div>
         </div>
+
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Cadastrar</button>
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
@@ -185,5 +252,4 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/users.js') }}"></script>
-
 {% endblock conteudo %}

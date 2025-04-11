@@ -1,13 +1,19 @@
-version: '3'
+version: '3.9'
 
 services:
   portellaweb:
-    image: portella-web
     build: .
+    image: portella-web
     container_name: portella-web
+    ports:
+      - "5000:5000"  # expõe a porta do Gunicorn
     networks:
       - metanet1
       - nginxmaneger
+    restart: always
+    environment:
+      - ENV=production
+
 networks:
   metanet1:
     external: true

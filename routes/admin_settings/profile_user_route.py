@@ -1,11 +1,32 @@
 import csv
 import io
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, make_response
+from model.permission_model import Permission
 from permission_required import permission_required
 from schema.user.profile_schema import ProfileSchema
-from service.user.profile_service import list_profile_page, create_profile, get_profile_by_id, update_profile, delete_profile
-
+from service.user.permission_service import grant_permission_to_profile
+from service.user.profile_service import list_profile_page, create_profile, get_profile_by_id, delete_profile
+from service.user.profile_service import update_profile_with_permissions
 profile_bp = Blueprint("profile", __name__)
+
+
+@profile_bp.route("/profile/permissoes-existentes")
+@permission_required("admin")
+def permissoes_existentes():
+    permissoes = Permission.query.with_entities(Permission.route_name).distinct().all()
+    return jsonify([p.route_name for p in permissoes])
+
+@profile_bp.route("/permission/autocomplete")
+@permission_required("admin")
+def autocomplete_permissions():
+    permissoes = Permission.query.with_entities(Permission.route_name).distinct().all()
+    nomes = [p.route_name for p in permissoes]
+    return jsonify(nomes)
+
+@profile_bp.route("/permissions")
+def list_all_permissions():
+    permissoes = Permission.query.with_entities(Permission.route_name).distinct().all()
+    return jsonify([p.route_name for p in permissoes])
 
 @profile_bp.route("/profile_user")
 @permission_required("admin")
@@ -23,10 +44,21 @@ def list_profiles_route():
 def register_profile():
     if request.method == "POST":
         nome = request.form.get("nome")
+        permissoes_json = request.form.get("permissoes")
+
         if not nome:
             return render_template("profile/register_profile.html", erros={"nome": "Nome é obrigatório"})
-        create_profile(nome)
+
+        perfil = create_profile(nome)
+
+        if permissoes_json:
+            import json
+            permissoes = json.loads(permissoes_json)
+            for p in permissoes:
+                grant_permission_to_profile(perfil.id, p)
+
         return redirect(url_for("profile.list_profiles_route"))
+
     return render_template("profile/register_profile.html")
 
 @profile_bp.route("/profile/<int:id>/update", methods=["GET", "POST"])
@@ -35,10 +67,18 @@ def update_profile_route(id):
     perfil_bd = get_profile_by_id(id)
     if not perfil_bd:
         return make_response(jsonify("Perfil não encontrado"), 404)
+
     if request.method == "GET":
         return render_template("profile/update_profile.html", perfil=perfil_bd)
+
     novo_nome = request.form.get("nome")
-    update_profile(perfil_bd, novo_nome)
+    permissoes_json = request.form.get("permissoes")
+
+    import json
+    permissoes = json.loads(permissoes_json) if permissoes_json else []
+
+    update_profile_with_permissions(perfil_bd, novo_nome, permissoes)
+
     return redirect(url_for("profile.list_profiles_route"))
 
 @profile_bp.route("/profile/<int:id>/remove")

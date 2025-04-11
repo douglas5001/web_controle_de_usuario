@@ -2,6 +2,8 @@ from app import db
 from model.user_model import User
 from sqlalchemy.orm import joinedload
 
+from service.user.file_service import delete_avatar, save_avatar
+
 
 def list_user(page, per_page, search=None, search_field="name"):
     query = User.query.options(joinedload(User.profile))
@@ -16,18 +18,19 @@ def list_user(page, per_page, search=None, search_field="name"):
             query = query.join(Profile).filter(Profile.name.ilike(search_pattern))
     return query.order_by(User.id).paginate(page=page, per_page=per_page, error_out=False)
 
-def create_user(user):
-    user_db = User(
-        name=user.name, 
-        email=user.email, 
-        password=user.password, 
-        is_admin=user.is_admin,
-        profile_id=user.profile_id
-    )
-    user_db.encrypt_password()
-    db.session.add(user_db)
+def create_user(user, file_storage):
+    # Verifica se há arquivo de imagem
+    if file_storage:
+        try:
+            # Salva a imagem
+            avatar_filename = save_avatar(file_storage)
+            user.avatar = avatar_filename
+        except ValueError as e:
+            raise ValueError(str(e))  # Caso a extensão não seja permitida
+
+    # Cria o usuário
+    db.session.add(user)
     db.session.commit()
-    return user_db
 
 def delete_user(user_id):
     user = User.query.filter_by(id=user_id).first()
@@ -36,17 +39,33 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
 
-def update_user(previous_user, new_user):
-    previous_user.name = new_user.name
-    previous_user.email = new_user.email
+def update_user(
+    previous_user,
+    new_user,
+    file_storage=None,
+    remove_avatar=False,
+    change_password=False,
+    ):
+    previous_user.name     = new_user.name
+    previous_user.email    = new_user.email
     previous_user.is_admin = new_user.is_admin
 
-    if new_user.password != previous_user.password:
+    if change_password:
         previous_user.password = new_user.password
         previous_user.encrypt_password()
-    
-    if new_user.profile_id:
-        previous_user.profile_id = new_user.profile_id
+
+    # --- PERFIL -------------------------------------------------------------
+    # Atualiza ou remove perfil conforme escolha do usuário
+    previous_user.profile_id = new_user.profile_id   # ← linha única resolve
+
+    # ------------------------------------------------------------------------
+    if remove_avatar:
+        delete_avatar(previous_user.avatar)
+        previous_user.avatar = None
+
+    if file_storage and file_storage.filename:
+        delete_avatar(previous_user.avatar)
+        previous_user.avatar = save_avatar(file_storage)
 
     db.session.commit()
 
