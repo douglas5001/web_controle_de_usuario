@@ -10,6 +10,7 @@ from sqlalchemy import text
 import plotly.graph_objs as go
 from plotly.offline import plot
 
+from permission_required import permission_required
 from queries.notificacoes import import_notioficacoes_civel
 import jwt
 
@@ -17,6 +18,7 @@ import jwt
 notification_gcpj_pb = Blueprint("notification_gcpj", __name__)
 
 @notification_gcpj_pb.route("/dashboard")
+@permission_required("todos")
 def dashboard():
     vendas = [
         {"mes": "Janeiro", "quantidade": 10},
@@ -48,6 +50,7 @@ def dashboard():
     return render_template("dashboards/dashboard.html", grafico=grafico_html, iframe_url=iframe_url)
 
 @notification_gcpj_pb.route("/tarefas-ti")
+@permission_required("todos")
 def tarefas_ti():
     ########
     METABASE_SITE_URL = "http://metabase.saratt.com.br"
@@ -65,6 +68,7 @@ def tarefas_ti():
 
 
 @notification_gcpj_pb.route("/notificacoes")
+@permission_required("todos")
 def notificacoes():
     sql = text(import_notioficacoes_civel())
     resultado = db.session.execute(sql)
@@ -86,6 +90,7 @@ def notificacoes():
 
 
 @notification_gcpj_pb.route("/relatorio_ti")
+@permission_required("todos")
 def relatorio_ti():
     METABASE_SITE_URL = "http://metabase.saratt.com.br"
     METABASE_SECRET_KEY = "cfda76a2c906ff51dd438dc5280c77876066db7f6412c92e0874d34cbf20f8f8"
@@ -106,6 +111,7 @@ def relatorio_ti():
     
     
 @notification_gcpj_pb.route("/notificacoes/exportar")
+@permission_required("todos")
 def exportar_notificacoes_excel():
     sql = text(import_notioficacoes_civel())
     resultado = db.session.execute(sql)

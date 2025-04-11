@@ -19,16 +19,16 @@ def list_user(page, per_page, search=None, search_field="name"):
     return query.order_by(User.id).paginate(page=page, per_page=per_page, error_out=False)
 
 def create_user(user, file_storage):
-    # Verifica se há arquivo de imagem
     if file_storage:
         try:
-            # Salva a imagem
             avatar_filename = save_avatar(file_storage)
             user.avatar = avatar_filename
         except ValueError as e:
-            raise ValueError(str(e))  # Caso a extensão não seja permitida
+            raise ValueError(str(e))
 
-    # Cria o usuário
+    # 🔐 Criptografa a senha antes de salvar
+    user.encrypt_password()
+
     db.session.add(user)
     db.session.commit()
 

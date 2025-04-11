@@ -24,6 +24,7 @@ def autocomplete_permissions():
     return jsonify(nomes)
 
 @profile_bp.route("/permissions")
+@permission_required("admin")
 def list_all_permissions():
     permissoes = Permission.query.with_entities(Permission.route_name).distinct().all()
     return jsonify([p.route_name for p in permissoes])
