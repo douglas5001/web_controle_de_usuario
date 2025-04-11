@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/card-menu.css') }}">
 </head>
-<body>
+<body class="layout">
 
   <div id="loader-overlay">
     <div class="spinner-border text-primary" role="status">
@@ -101,7 +101,7 @@
           src="{% if current_user and current_user.avatar %}
                  {{ current_user.avatar_url() }}
                {% else %}
-                 {{ url_for('static', filename='assets/image/avatar_default.png') }}
+                 {{ url_for('static', filename='uploads/avatars/default.png') }}
                {% endif %}"
         >
         <span class="nomeUsuario">
