@@ -5,7 +5,7 @@ import pandas as pd
 from app import db
 from flask import Blueprint, render_template, send_file
 from sqlalchemy import text
-from flask_jwt_extended import jwt_required, get_jwt_identity
+
 
 import plotly.graph_objs as go
 from plotly.offline import plot
@@ -46,6 +46,22 @@ def dashboard():
     iframe_url = f"{METABASE_SITE_URL}/embed/dashboard/{token}#bordered=true&titled=true"
 
     return render_template("dashboards/dashboard.html", grafico=grafico_html, iframe_url=iframe_url)
+
+@notification_gcpj_pb.route("/tarefas-ti")
+def tarefas_ti():
+    ########
+    METABASE_SITE_URL = "http://metabase.saratt.com.br"
+    METABASE_SECRET_KEY = "cfda76a2c906ff51dd438dc5280c77876066db7f6412c92e0874d34cbf20f8f8"
+    payload = {
+        "resource": {"dashboard": 12},
+        "params": {},
+        "exp": round(time.time()) + 600
+    }
+
+    token = jwt.encode(payload, METABASE_SECRET_KEY, algorithm="HS256")
+    iframe_url = f"{METABASE_SITE_URL}/embed/dashboard/{token}#background=false&bordered=false&titled=false"
+
+    return render_template("dashboards/tarefas_ti.html", iframe_url=iframe_url)
 
 
 @notification_gcpj_pb.route("/notificacoes")

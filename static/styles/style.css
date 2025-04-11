@@ -7,6 +7,25 @@ html {
   height: -webkit-fill-available;
 }
 
+#loader-overlay {
+  position: fixed;
+  z-index: 9999;
+  background-color: rgba(255, 255, 255, 0.027);
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+}
+
+body.loaded #loader-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
 main {
   display: flex;
   flex-wrap: nowrap;

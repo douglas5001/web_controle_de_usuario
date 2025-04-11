@@ -1,12 +1,14 @@
 import csv
 import io
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, make_response
+from permission_required import permission_required
 from schema.user.profile_schema import ProfileSchema
 from service.user.profile_service import list_profile_page, create_profile, get_profile_by_id, update_profile, delete_profile
 
 profile_bp = Blueprint("profile", __name__)
 
 @profile_bp.route("/profile_user")
+@permission_required("admin")
 def list_profiles_route():
     pagina = request.args.get("page", 1, type=int)
     busca = request.args.get("search", "")
@@ -17,6 +19,7 @@ def list_profiles_route():
     return render_template("user/profile_user.html", perfis=perfis_serializados, busca=busca, campo=campo, pagina=pagina, total_paginas=perfis_paginados.pages)
 
 @profile_bp.route("/profile/register", methods=["GET", "POST"])
+@permission_required("admin")
 def register_profile():
     if request.method == "POST":
         nome = request.form.get("nome")
@@ -27,6 +30,7 @@ def register_profile():
     return render_template("profile/register_profile.html")
 
 @profile_bp.route("/profile/<int:id>/update", methods=["GET", "POST"])
+@permission_required("admin")
 def update_profile_route(id):
     perfil_bd = get_profile_by_id(id)
     if not perfil_bd:
@@ -38,11 +42,13 @@ def update_profile_route(id):
     return redirect(url_for("profile.list_profiles_route"))
 
 @profile_bp.route("/profile/<int:id>/remove")
+@permission_required("admin")
 def remove_profile(id):
     delete_profile(id)
     return redirect(url_for("profile.list_profiles_route"))
 
 @profile_bp.route("/profile/excel")
+@permission_required("admin")
 def export_profiles_excel():
     busca = request.args.get("search", "")
     campo = request.args.get("field", "name")

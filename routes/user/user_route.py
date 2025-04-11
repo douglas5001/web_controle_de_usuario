@@ -1,6 +1,7 @@
 import csv
 import io
 from flask import Blueprint, render_template, redirect, request, url_for, jsonify, make_response
+from permission_required import permission_required
 from schema.user.user_schema import UserSchema
 from service.user.user_service import list_user, create_user, delete_user, list_user_id, update_user
 from service.user.profile_service import list_profiles, get_profile_by_id
@@ -10,6 +11,7 @@ from model.user_model import User
 user_bp = Blueprint("user", __name__)
 
 @user_bp.route("/users")
+@permission_required("admin")
 def get_user():
     page = request.args.get("page", 1, type=int)
     search = request.args.get("search", "")
@@ -29,6 +31,7 @@ def get_user():
     )
 
 @user_bp.route("/register", methods=["GET", "POST"])
+@permission_required("admin")
 def register_user():
     if request.method == "POST":
         profile_id_str = request.form.get("profile_id")
@@ -62,11 +65,13 @@ def register_user():
     return render_template("user/register.html", profiles=profiles)
 
 @user_bp.route("/<int:id>/remove_user")
+@permission_required("admin")
 def remove_user(id):
     delete_user(id)
     return redirect(url_for("user.get_user"))
 
 @user_bp.route("/<int:id>/update_user", methods=["GET", "POST"])
+@permission_required("admin")
 def put_user(id):
     user_db = list_user_id(id)
     if not user_db:
@@ -91,6 +96,7 @@ def put_user(id):
 
 
 @user_bp.route("/users/excel")
+@permission_required("admin")
 def users_excel():
     page = request.args.get("page", 1, type=int)
     search = request.args.get("search", "")

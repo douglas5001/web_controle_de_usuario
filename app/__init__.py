@@ -27,16 +27,30 @@ def create_app():
     @app.context_processor
     def inject_current_user():
         try:
-            # Importa aqui dentro para evitar ciclo
             from service.user.user_service import list_user_id
+            from service.user.permission_service import user_has_permission
+
             verify_jwt_in_request(optional=True)
             user_id = get_jwt_identity()
+
             if user_id:
                 g.current_user = list_user_id(user_id)
-                return {"current_user": g.current_user}
-        except:
-            pass
-        return {"current_user": None}
+
+                def has_permission(route_name):
+                    return user_has_permission(g.current_user, route_name)
+
+                return {
+                    "current_user": g.current_user,
+                    "has_permission": has_permission
+                }
+
+        except Exception as e:
+            print("Erro no context_processor:", e)
+
+        return {
+            "current_user": None,
+            "has_permission": lambda route: False
+        }
 
     from routes import register_routes
     register_routes(app)

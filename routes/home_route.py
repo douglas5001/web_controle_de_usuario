@@ -10,7 +10,7 @@ from entity.user import User
 home_bp = Blueprint("home", __name__)
 
 @home_bp.route("/", methods=["GET"])
-@permission_required("rota_listar_usuarios")
+@jwt_required()
 def layout():
     user_id = get_jwt_identity()  # Obtém o ID do usuário autenticado
     user = list_user_id(user_id)

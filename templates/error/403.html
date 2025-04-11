@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 - Acesso Negado</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #ffcc00;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+    }
+
+    .container-error {
+      display: flex;
+      align-items: center;
+      gap: 50px;
+    }
+
+    .error-text {
+      max-width: 400px;
+    }
+
+    .error-text h1 {
+      font-size: 80px;
+      font-weight: bold;
+    }
+
+    .error-text p {
+      font-size: 20px;
+      margin: 20px 0;
+    }
+
+    .btn-back {
+      background-color: transparent;
+      border: 2px solid #000;
+      color: #000;
+      transition: 0.3s;
+    }
+
+    .btn-back:hover {
+      background-color: #000;
+      color: #fff;
+    }
+
+    .illustration img {
+      max-height: 400px;
+      width: auto;
+    }
+
+    @media (max-width: 768px) {
+      .container-error {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .illustration img {
+        max-height: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container-error">
+    <div class="illustration">
+      <img src="../../static/assets/image/erro-403-forbidden.jpeg" alt="403 - Forbidden">
+    </div>
+    <div class="error-text">
+      <h1>403</h1>
+      <h4>Acesso Negado</h4>
+      <p>Você não tem permissão para acessar esta página.</p>
+      <button class="btn btn-back" onclick="history.back()">
+        <i class="bi bi-arrow-left"></i> Voltar
+      </button>
+    </div>
+  </div>
+</body>
+</html>

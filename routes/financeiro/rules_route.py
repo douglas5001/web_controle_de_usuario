@@ -1,13 +1,15 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from permission_required import permission_required
 from service.financeiro.rule_service import create_rule, listar_regras, update_rule, delete_rule
 from model.financeiro.rule_model import Rule
 from model.financeiro.bradesco_honorarios_model import BradescoHonorario
 from sqlalchemy.exc import SQLAlchemyError
 import json
 
-rule_bp = Blueprint("rule", __name__, url_prefix="/rules")
+rule_bp = Blueprint("rule", __name__)
 
-@rule_bp.route("/", methods=["GET"])
+@rule_bp.route("/regras-fiananceiro", methods=["GET"])
+@permission_required("financeiro")
 def get_rules():
     pagina = request.args.get("page", 1, type=int)
     busca = request.args.get("search", "")
@@ -24,6 +26,7 @@ def get_rules():
     )
 
 @rule_bp.route("/new", methods=["GET", "POST"])
+@permission_required("financeiro")
 def new_rule():
     honorarios = BradescoHonorario.query.all()
     if request.method == "POST":
@@ -62,6 +65,7 @@ def new_rule():
     return render_template("financeiro/rules/new_rule.html", honorarios=honorarios)
 
 @rule_bp.route("/<int:rule_id>/edit", methods=["GET", "POST"])
+@permission_required("financeiro")
 def edit_rule(rule_id):
     regra = Rule.query.get_or_404(rule_id)
     honorarios = BradescoHonorario.query.all()
@@ -109,6 +113,7 @@ def edit_rule(rule_id):
     return render_template("financeiro/rules/edit_rule.html", rule=regra, honorarios=honorarios)
 
 @rule_bp.route("/<int:rule_id>/delete", methods=["POST"])
+@permission_required("financeiro")
 def remove_rule(rule_id):
     regra = Rule.query.get_or_404(rule_id)
     try:

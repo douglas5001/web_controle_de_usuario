@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  portellaweb:
+    image: portella-web
+    build: .
+    container_name: portella-web
+    networks:
+      - metanet1
+      - nginxmaneger
+networks:
+  metanet1:
+    external: true
+  nginxmaneger:
+    external: true
